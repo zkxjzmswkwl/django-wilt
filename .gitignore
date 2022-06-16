@@ -1,0 +1,9 @@
+*.sqlite3
+*.sql
+*.pyc
+*.jpg
+*.png
+*.gif
+*.mp4
+*/migrations
+
