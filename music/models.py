@@ -1,4 +1,5 @@
 from django.db import models
+from members.models import Member
 
 
 class Artist(models.Model):
@@ -12,11 +13,11 @@ class Artist(models.Model):
     creation_timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.title} ({self.id})"
+        return self.title
 
 
 class Album(models.Model):
-    title = models.CharField(max_length=124, unique=True, blank=False, null=False)
+    title = models.CharField(max_length=124, blank=False, null=False)
     year = models.DateTimeField(null=True, blank=True)
     cover = models.FileField(upload_to="covers/", null=True, blank=True)
     about = models.TextField(max_length=4800, null=True, blank=True)
@@ -27,9 +28,8 @@ class Album(models.Model):
         return f"{self.title} ({self.id})"
 
 
-
 class Song(models.Model):
-    title = models.CharField(max_length=124, unique=True, blank=False, null=False)
+    title = models.CharField(max_length=124, blank=False, null=False)
     year = models.DateTimeField(null=True, blank=True)
     about = models.TextField(max_length=2800, null=True, blank=True)
     """
@@ -46,10 +46,26 @@ class Song(models.Model):
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
     album = models.ForeignKey(Album, on_delete=models.CASCADE, null=True, blank=True)
     """"""
-    listen_count = models.IntegerField(default=0)
+    listen_count = models.IntegerField(default=1)
     creation_timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.title} ({self.id})"
+        return self.title
+    
+    def increment_listens(self):
+        self.listen_count = self.listen_count + 1
+        self.save()
 
+
+class Scrobble(models.Model):
+    belongs_to = models.ForeignKey(Member, on_delete=models.CASCADE, null=False, blank=False)
+    song = models.ForeignKey(Song, on_delete=models.CASCADE, null=False, blank=False)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.song.title} - {self.belongs_to.username}"
+
+    @property
+    def artist(self):
+        return self.song.artist.title
 

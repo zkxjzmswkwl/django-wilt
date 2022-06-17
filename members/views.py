@@ -11,6 +11,8 @@ class MemberViewSet(ModelViewSet):
     serializer_class = MemberSerializer
 
     @action(detail=False, methods=["GET"])
-    def sort(self, request):
-             return Response(data={"test": "hello"})
+    def me(self, request):
+        if request.user.is_anonymous:
+            return Response(data={"err": "You're not logged in men."})
+        return Response(MemberSerializer(instance=request.user).data)
 
