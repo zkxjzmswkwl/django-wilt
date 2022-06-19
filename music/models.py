@@ -56,6 +56,16 @@ class Song(models.Model):
         self.listen_count = self.listen_count + 1
         self.save()
 
+    #  @property
+    #  def artist(self):
+        #  """
+        #  maybe stupid decision from stupid man ook ook.
+        #  we already have this on Scrobble, so it might be worth
+        #  just leaving this here, then removing the property from Scrobble
+        #  in favor of this 'un here.
+        #  """
+        #  return self.artist.title
+
 
 class Scrobble(models.Model):
     belongs_to = models.ForeignKey(Member, on_delete=models.CASCADE, null=False, blank=False)
@@ -68,4 +78,8 @@ class Scrobble(models.Model):
     @property
     def artist(self):
         return self.song.artist.title
+
+    @property
+    def spreadsheet_entry(self):
+        return f"{self.timestamp},{self.song.artist.title},{self.song.title}"
 

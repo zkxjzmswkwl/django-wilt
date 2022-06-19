@@ -2,6 +2,8 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
+from django.http.response import HttpResponse
+from .datadl import gen_scrobble_sheet
 
 from .models import Artist, Album, Song, Scrobble
 from .serializers import ArtistSerializer, AlbumSerializer, SongSerializer, ScrobbleSerializer, ScrobbleSerializerVerbose
@@ -105,4 +107,20 @@ class ScrobbleViewSet(ModelViewSet):
 
         queryset = self.queryset.order_by("-timestamp")[:int(count)]
         return Response(ScrobbleSerializerVerbose(instance=queryset, many=True).data)
+    
+    @action(detail=False, methods=["GET"])
+    def dl_my_scrobbles(self, request):
+        given_id = request.query_params.get("user_id", None)
+
+        if request.user.is_anonymous and given_id is None:
+            return Response(data={"err": "men u are not logged in"})
+
+        user_id = given_id
+
+        formatting = request.query_params.get("formatting", None)
+        if formatting is None:
+            formatting = "xls"
+
+        if formatting == "xls":
+            return HttpResponse(gen_scrobble_sheet(user_id), content_type="text/plain")
 
