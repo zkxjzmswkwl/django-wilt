@@ -3,6 +3,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from django.http.response import HttpResponse
+
+import uuid
+
 from .datadl import gen_scrobble_sheet
 
 from .models import Artist, Album, Song, Scrobble
@@ -13,10 +16,64 @@ class ArtistViewSet(ModelViewSet):
     queryset = Artist.objects.all()
     serializer_class = ArtistSerializer
 
+    @action(detail=False, methods=["POST"])
+    def upload_art(self, request):
+        artist_name = request.query_params.get("artist", None)
+        if artist_name is None:
+            return Response(data={"err": "required param artist not found."}, status=status.HTTP_400_BAD_REQUEST)
+
+        uploaded_file = request.data.get("file", None)
+        if uploaded_file is None:
+            return Response({"err": "No file uploaded."}, status=status.HTTP_400_BAD_REQUEST)
+        print(uploaded_file.name)
+        uploaded_file.name = f"{uuid.uuid4().hex[:32]}.jpg"
+
+        artist = Artist.objects.get(title__iexact=artist_name)
+        artist.pic = uploaded_file
+        artist.save()
+        return HttpResponse("aiosjdasd")
+
+    @action(detail=False, methods=["GET"])
+    def get_by(self, request):
+        queryset = None
+        name = request.query_params.get("name", None)
+        if name is not None:
+            queryset = self.queryset.get(title__iexact=name)
+        return Response(ArtistSerializer(instance=queryset).data)
+    
+    @action(detail=True, methods=["GET"])
+    def top_listeners(self, request, pk=None):
+        if pk is None:
+            return Response(data={"err": "pk is none"}, status=status.HTTP_400_BAD_REQUEST)
+        # TODO: Come back to this when final db schema decisions made.
+        pass
+
+    @action(detail=True, methods=["GET"])
+    def count(self, request, pk=None):
+        if pk is None:
+            return Response(data={"err": "pk is none"}, status=status.HTTP_400_BAD_REQUEST)
+
+        artist = Artist.objects.get(id=pk)
+        scrobble_count = Scrobble.objects.all().filter(
+                song__artist__title__iexact=artist.title).count()
+        return Response({"count": scrobble_count})
+    
+    @action(detail=True, methods=["GET"])
+    def recent_listens(self, request, pk=None):
+        if pk is None:
+            return Response(data={"err": "pk is none"}, status=status.HTTP_400_BAD_REQUEST)
+
+        count = request.query_params.get("count", 4)
+        artist = Artist.objects.get(id=pk)
+        recent_scrobbles = Scrobble.objects.all().filter(
+                song__artist__title__iexact=artist.title).order_by("-timestamp")[:int(count)]
+        return Response(ScrobbleSerializerVerbose(instance=recent_scrobbles, many=True).data)
+
+
 
 class AlbumViewSet(ModelViewSet):
     queryset = Album.objects.all()
-    serializer_class = ArtistSerializer
+    serializer_class = AlbumSerializer
 
 
 class SongViewSet(ModelViewSet):
@@ -38,6 +95,9 @@ class ScrobbleViewSet(ModelViewSet):
 
         if artist is None or song is None:
             return Response(data={"err": "artist and song both required fields."})
+
+        if "encodeplussymbol" in artist:
+            artist.replace("encodeplussymbol", "+")
         
         # Check if the artist already exists in our db
         artist_obj, created = Artist.objects.get_or_create(title=artist)

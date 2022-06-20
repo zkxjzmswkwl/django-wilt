@@ -11,7 +11,8 @@ class Member(AbstractUser):
     Just need representation of the user model, even though we're extending Django's.
     Enables additions later down the line with less headache.
     """
-    pass
+    def __str__(self):
+        return self.username
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)

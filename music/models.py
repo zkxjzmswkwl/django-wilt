@@ -9,7 +9,7 @@ class Artist(models.Model):
     year_disband = models.DateTimeField(null=True, blank=True)
     formed_in = models.CharField(max_length=82, null=True, blank=True)
     about = models.TextField(max_length=4800, null=True, blank=True)
-    pic = models.FileField(upload_to="artists/", null=True, blank=True)
+    pic = models.FileField(upload_to="artists/", null=False, blank=False, default="artists/Cover.jpg")
     creation_timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -45,7 +45,7 @@ class Song(models.Model):
     """
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
     album = models.ForeignKey(Album, on_delete=models.CASCADE, null=True, blank=True)
-    """"""
+
     listen_count = models.IntegerField(default=1)
     creation_timestamp = models.DateTimeField(auto_now_add=True)
 
@@ -78,6 +78,12 @@ class Scrobble(models.Model):
     @property
     def artist(self):
         return self.song.artist.title
+
+    @property
+    def art(self):
+        if self.song.artist.pic.name:
+            return self.song.artist.pic.url
+        return "None"
 
     @property
     def spreadsheet_entry(self):

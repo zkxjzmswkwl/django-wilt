@@ -39,8 +39,14 @@ class ScrobbleSerializer(ModelSerializer):
 class ScrobbleSerializerVerbose(ModelSerializer):
     song = StringRelatedField()
     artist = ReadOnlyField()
+    art = ReadOnlyField()
+    belongs_to = StringRelatedField()
 
     class Meta:
         model = Scrobble
         fields = "__all__"
+
+
+class SongSerializerVerbose(ModelSerializer):
+    artist = ReadOnlyField()
 
