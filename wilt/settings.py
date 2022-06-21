@@ -22,7 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+# If you clone this repoistory and choose to run this code in production,
+# you MUST change this key. Not doing so will result in bad things like bombs blowing up etc.
 SECRET_KEY = 'django-insecure-qtkie!i#op5sr@osibi-tdw%6&ivoa!q%2t!l$7!0ids8x(39w'
+SITE_URL = "imgay.com"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -44,8 +47,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
+    'markdownfield',
     'members.apps.MembersConfig',
-    'music.apps.MusicConfig'
+    'music.apps.MusicConfig',
+    'updates.apps.UpdatesConfig'
 ]
 
 MIDDLEWARE = [

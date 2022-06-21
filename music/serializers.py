@@ -21,6 +21,8 @@ class AlbumSerializer(ModelSerializer):
 
 
 class SongSerializer(ModelSerializer):
+    art = ReadOnlyField()
+
     class Meta:
         model = Song
         fields = "__all__"
@@ -39,8 +41,8 @@ class ScrobbleSerializer(ModelSerializer):
 class ScrobbleSerializerVerbose(ModelSerializer):
     song = StringRelatedField()
     artist = ReadOnlyField()
-    art = ReadOnlyField()
     belongs_to = StringRelatedField()
+    art = ReadOnlyField()
 
     class Meta:
         model = Scrobble

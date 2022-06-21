@@ -16,6 +16,30 @@ class ArtistViewSet(ModelViewSet):
     queryset = Artist.objects.all()
     serializer_class = ArtistSerializer
 
+    @action(detail=True, methods=["GET"])
+    def get_top_songs(self, request, pk=None):
+        """
+        Gets the most listened to songs for an artist.
+        By default, it returns an ordered count of 10.
+        
+        To overwrite the default countm, specify ?count=<int> 
+        """
+        if pk is None:
+            return Response({"err": "required parameter /artists/:id not found."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # TODO: Someone please tell me if there's a way to, in one call, get and cast a value from a dict.
+        # I feel like there definitely is?
+        count = request.query_params.get("count", None)
+        if count is None:
+            count = 10
+        else:
+            # If a count was specified via ?count, it will be of type str.
+            # We need it to be type int in order to call [:int]
+            count = int(count)
+
+        songs = Song.objects.filter(artist__id=int(pk)).order_by("-listen_count")[:count]
+        return Response(SongSerializer(instance=songs, many=True).data)
+
     @action(detail=False, methods=["POST"])
     def upload_art(self, request):
         artist_name = request.query_params.get("artist", None)
@@ -167,6 +191,7 @@ class ScrobbleViewSet(ModelViewSet):
 
         queryset = self.queryset.order_by("-timestamp")[:int(count)]
         return Response(ScrobbleSerializerVerbose(instance=queryset, many=True).data)
+
     
     @action(detail=False, methods=["GET"])
     def dl_my_scrobbles(self, request):
