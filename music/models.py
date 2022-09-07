@@ -76,12 +76,12 @@ class Song(models.Model):
 
 
 class Scrobble(models.Model):
-    belongs_to = models.ForeignKey(Member, on_delete=models.CASCADE, null=False, blank=False)
+    member = models.ForeignKey(Member, on_delete=models.CASCADE, null=False, blank=False)
     song = models.ForeignKey(Song, on_delete=models.CASCADE, null=False, blank=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.song.title} - {self.belongs_to.username}"
+        return f"{self.song.title} - {self.member.username}"
 
     # TODO: See line 55
     @property

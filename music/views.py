@@ -24,6 +24,7 @@ class ArtistViewSet(ModelViewSet):
         
         To overwrite the default countm, specify ?count=<int> 
         """
+
         if pk is None:
             return Response({"err": "required parameter /artists/:id not found."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -141,7 +142,7 @@ class ScrobbleViewSet(ModelViewSet):
         else:
             song_obj = Song.objects.create(title=song, artist=artist_obj)
 
-        scrobble = Scrobble.objects.create(belongs_to=request.user, song=song_obj)
+        scrobble = Scrobble.objects.create(member=request.user, song=song_obj)
         return Response(ScrobbleSerializer(instance=scrobble).data)
 
     @action(detail=False, methods=["GET"])
@@ -167,10 +168,10 @@ class ScrobbleViewSet(ModelViewSet):
         queryset = None
 
         if user_id is not None:
-            queryset = self.queryset.filter(belongs_to__id=user_id)
+            queryset = self.queryset.filter(member__id=user_id)
 
         if username is not None:
-            queryset = self.queryset.filter(belongs_to__username__iexact=username)
+            queryset = self.queryset.filter(member__username__iexact=username)
         
         return Response(ScrobbleSerializerVerbose(instance=queryset, many=True).data)
 
