@@ -14,6 +14,13 @@ class Artist(models.Model):
 
     def __str__(self):
         return self.title
+    
+    @property
+    def photo(self):
+        check = Album.objects.filter(artist=self)
+        if check.exists():
+            if check.first().cover:
+                return check.first().cover.url
 
 
 class Album(models.Model):
@@ -52,14 +59,6 @@ class Song(models.Model):
     def __str__(self):
         return self.title
 
-    # TODO: Look for a way of sourcing serializer ReadOnlyFields from parent objects
-    # so this isn't duplicated both here/scrobble.
-    @property
-    def art(self):
-        if self.artist.pic.name:
-            return self.artist.pic.url
-        return "None"
-    
     def increment_listens(self):
         self.listen_count = self.listen_count + 1
         self.save()
@@ -93,7 +92,6 @@ class Scrobble(models.Model):
     @property
     def artist(self):
         return self.song.artist.title
-
 
     @property
     def spreadsheet_entry(self):
