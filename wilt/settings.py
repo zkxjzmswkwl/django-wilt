@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    "graphene_django",
     'markdownfield',
     'members.apps.MembersConfig',
     'music.apps.MusicConfig',

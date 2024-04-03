@@ -9,5 +9,3 @@ class Update(models.Model):
     markdown = MarkdownField(rendered_field="markdown_rendered", validator=VALIDATOR_STANDARD)
     markdown_rendered = RenderedMarkdownField()
 
-    # Apparently you have to migrate before accessing model.id?
-

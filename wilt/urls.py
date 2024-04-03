@@ -7,8 +7,6 @@ from rest_framework.authtoken import views
 from members.views import MemberViewSet
 from music.views import ArtistViewSet, AlbumViewSet, SongViewSet, ScrobbleViewSet
 from updates.views import UpdateViewSet
-from graphene_django.views import GraphQLView
-from music.schema import schema
 
 router = DefaultRouter()
 router.register(r"members", MemberViewSet)
@@ -22,5 +20,4 @@ urlpatterns = [
     path('fux/', include(router.urls)),
     path('admin/', admin.site.urls),
     path('api-auth/', views.obtain_auth_token),
-    path('graphql', GraphQLView.as_view(graphiql=False, schema=schema))
 ] + static('/', document_root=settings.MEDIA_ROOT)
